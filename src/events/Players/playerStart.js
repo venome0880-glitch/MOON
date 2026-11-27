@@ -10,6 +10,7 @@ const {
 } = require("discord.js");
 const { convertTime } = require("../../utils/convert.js");
 const sendActionLog = require("../../utils/actionLogger");
+const { THEME } = require("../../utils/theme");
 const MAX_TRACK_DURATION_MS = 24 * 60 * 60 * 1000;
 
 function sanitizeTrackLengthMs(value) {
@@ -305,7 +306,7 @@ async function createNowPlayingContainer(client, player, track, forcePaused = nu
     section.setThumbnailAccessory((thumb) => thumb.setURL(thumbnail));
   }
 
-  const container = new ContainerBuilder();
+  const container = new ContainerBuilder().setAccentColor(THEME.accent);
   if (thumbnail) container.addSectionComponents(section);
   else container.addTextDisplayComponents(headerDisplay, infoDisplay);
   container.addSeparatorComponents(new SeparatorBuilder());

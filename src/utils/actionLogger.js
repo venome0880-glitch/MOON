@@ -6,6 +6,7 @@ const {
   TextDisplayBuilder,
 } = require("discord.js");
 const Logs = require("../schema/logs");
+const { THEME } = require("./theme");
 
 function formatSource(source) {
   const normalizedSource = String(source || "bot_commands").toLowerCase();
@@ -66,7 +67,7 @@ async function sendActionLog(client, guild, user, action, track = null, options 
     const summary = new TextDisplayBuilder().setContent("### Action Logs");
     const body = new TextDisplayBuilder().setContent(details.join("\n"));
 
-    const container = new ContainerBuilder();
+    const container = new ContainerBuilder().setAccentColor(THEME.accent);
     if (track?.thumbnail) {
       const section = new SectionBuilder().addTextDisplayComponents(summary, body);
       section.setThumbnailAccessory((thumbnail) => thumbnail.setURL(track.thumbnail));

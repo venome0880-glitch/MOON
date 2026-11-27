@@ -142,7 +142,7 @@ module.exports = {
 
             const serverList = currentServers.map((guild, i) => {
                 const position = start + i + 1;
-                const ownerTag = guild.ownerId === user.id ? ' \`👑\`' : '';
+                const ownerTag = guild.ownerId === user.id ? ` ${client.emoji?.star || '♦️'}` : '';
                 return `**\`${position}\` | ${guild.name}${ownerTag} | \`${guild.id}\` | \`${guild.memberCount}\`**`;
             }).join('\n');
 

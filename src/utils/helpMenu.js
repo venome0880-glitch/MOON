@@ -4,6 +4,7 @@ const {
   TextDisplayBuilder, ThumbnailBuilder, escapeMarkdown,
 } = require("discord.js");
 const { isBotOwner } = require("./commandAccess");
+const { THEME } = require("./theme");
 
 const PAGE_SIZE = 8;
 const MENU_LIFETIME = 10 * 60_000;
@@ -65,7 +66,7 @@ function buildHelpMenu(client, userId, prefix, {
   )).setThumbnailAccessory(new ThumbnailBuilder()
     .setURL(client.user.displayAvatarURL({ extension: "png", size: 128 }))
     .setDescription(`${client.user.username} avatar`));
-  const container = new ContainerBuilder().setAccentColor(0xB49AEF)
+  const container = new ContainerBuilder().setAccentColor(THEME.accent)
     .addSectionComponents(header).addSeparatorComponents(new SeparatorBuilder());
 
   let pageCount = 1;
@@ -133,7 +134,7 @@ function buildHelpMenu(client, userId, prefix, {
     new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(label).setURL(url).setEmoji(icon(client, emoji)))));
   container.addTextDisplayComponents(text(
     `-# Use \`${inline(prefix)}help <command>\` for usage and aliases. · Menu expires <t:${Math.floor(expiresAt / 1000)}:R>.\n` +
-    `-# [MOON by rock-forge](https://github.com/rock-forge/Kreo)`,
+    `-# MOON · Made by VENOME · Based on [Kreo by rock-forge](https://github.com/rock-forge/Kreo)`,
   ));
   return { components: [container], flags: MessageFlags.IsComponentsV2, allowedMentions: { parse: [], repliedUser: false } };
 }
@@ -145,7 +146,7 @@ async function execute(message, args, client, prefix = client.prefix) {
     const name = client.aliases.get(query) || query;
     command = visibleCommands(client, message.author.id).find(item => item.name === name);
     if (!command) return message.reply({
-      components: [new ContainerBuilder().setAccentColor(0xB49AEF).addTextDisplayComponents(text(
+      components: [new ContainerBuilder().setAccentColor(THEME.accent).addTextDisplayComponents(text(
         `### ${icon(client, "info")} Command not found\nNo available command matches \`${inline(query)}\`. Use \`${inline(prefix)}help\` to browse your commands.`,
       ))], flags: MessageFlags.IsComponentsV2, allowedMentions: { parse: [], repliedUser: false },
     });

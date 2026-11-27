@@ -34,6 +34,7 @@ test("the canonical bot variable names remain supported", () => {
     DISCORD_CLIENT_ID: "test-client", DISCORD_CLIENT_SECRET: "test-secret", LAVALINK_SECURE: "true" });
   assert.equal(config.token, "canonical-token");
   assert.equal(config.mongourl, "mongodb://localhost/canonical");
+  assert.equal(config.color, "#EF4444");
   assert.equal(config.nodes[0].secure, true);
   assert.match(config.dashboard.bridgeSecret, /^[a-f0-9]{64}$/);
 });

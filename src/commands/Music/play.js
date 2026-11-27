@@ -13,6 +13,7 @@ const {
 const UserPreferences = require("../../schema/userpreferences");
 const PrefixSchema = require("../../schema/prefix");
 const { convertTime } = require("../../utils/convert.js");
+const { THEME } = require("../../utils/theme");
 const MAX_TRACK_DURATION_MS = 24 * 60 * 60 * 1000;
 
 function sanitizeTrackLengthMs(value) {
@@ -167,7 +168,7 @@ function buildQueuedTrackContainer(track, requesterUser, position) {
     section.setThumbnailAccessory((thumbnail) => thumbnail.setURL(cleanThumbnail));
   }
 
-  const container = new ContainerBuilder();
+  const container = new ContainerBuilder().setAccentColor(THEME.accent);
   if (cleanThumbnail) container.addSectionComponents(section);
   else container.addTextDisplayComponents(titleDisplay, infoDisplay);
 
@@ -1025,6 +1026,7 @@ module.exports = {
       } else {
         const track = addedTracks[0];
         const { convertTime } = require("../../utils/convert.js");
+const { THEME } = require("../../utils/theme");
 
         const cleanAuthorName = (author) => {
           if (!author) return 'Unknown Artist';

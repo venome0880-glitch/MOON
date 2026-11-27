@@ -1,8 +1,11 @@
+const fs = require("node:fs");
+const path = require("node:path");
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { Client, Collection, Events, ComponentType, MessageFlags } = require("discord.js");
 const help = require("../src/utils/helpMenu");
-const { applyApplicationEmojis } = require("../src/utils/applicationEmojis");
+const { applyApplicationEmojis, loadEmojiManifest, syncApplicationEmojisFromFiles } = require("../src/utils/applicationEmojis");
+const { THEME, resolveBotColor } = require("../src/utils/theme");
 const owner = "688715932247261234", member = "123456789012345678";
 
 function fixture() {
@@ -27,18 +30,98 @@ function nodes(payload) {
 }
 function selectId(payload) { return nodes(payload).find(node => node.type === ComponentType.StringSelect).custom_id; }
 
-test("application emojis prefer the current purple set and preserve legacy key aliases", () => {
-  const target = { check: "✅", load: "⏳", shuffle: "🔀", suffle: "🔀", info: "ℹ️" };
+test("application emojis prefer the red animated set, preserve key aliases, and sync from files", async () => {
+  const target = { check: "⭕", load: "🔴", shuffle: "🔀", suffle: "🔀", info: "🔻" };
   applyApplicationEmojis(target, [
-    { name: "sb_check", id: "1546515896732754031" },
-    { name: "km_purple2_check", id: "1546795892240285788" },
-    { name: "km_purple2_loading", id: "1546795896929259610", animated: true },
-    { name: "km_purple2_shuffle", id: "1546795904097452057" },
+    { name: "km_purple2_check", id: "1546795892240285780" },
+    { name: "moon_red_check", id: "1546795892240285788", animated: true },
+    { name: "moon_red_loading", id: "1546795896929259610", animated: true },
+    { name: "moon_red_shuffle", id: "1546795904097452057", animated: true },
   ]);
-  assert.equal(target.check, "<:km_purple2_check:1546795892240285788>");
-  assert.equal(target.load, "<a:km_purple2_loading:1546795896929259610>");
+  assert.equal(target.check, "<a:moon_red_check:1546795892240285788>");
+  assert.equal(target.load, "<a:moon_red_loading:1546795896929259610>");
   assert.equal(target.suffle, target.shuffle);
-  assert.equal(target.info, "ℹ️");
+  assert.equal(target.info, "🔻");
+
+  const manifest = loadEmojiManifest();
+  assert.equal(manifest.theme, "red");
+  assert.equal(manifest.animated, true);
+  assert.ok(manifest.emojis.length >= 30);
+
+  const fallbackEmojis = require("../src/emojis");
+  for (const entry of manifest.emojis) {
+    assert.ok(fs.existsSync(entry.filePath), `Missing GIF asset: ${entry.file}`);
+    const fileBuf = fs.readFileSync(entry.filePath);
+    assert.equal(fileBuf.subarray(0, 3).toString("ascii"), "GIF", `${entry.file} must be a GIF`);
+    assert.ok(fileBuf.length > 0 && fileBuf.length < 256 * 1024, `${entry.file} must fit Discord's 256KB limit`);
+    assert.ok(Object.hasOwn(fallbackEmojis, entry.key), `Missing fallback key in src/emojis.js: ${entry.key}`);
+  }
+
+  let seq = 170000000000000000n;
+  const store = new Map([
+    ["legacy", { id: "160000000000000001", name: "moon_red_check", animated: false }],
+  ]);
+  const deleted = [];
+  const created = [];
+  const fakeClient = {
+    emoji: { ...fallbackEmojis },
+    logger: { log() {} },
+    application: {
+      emojis: {
+        async fetch() { return store; },
+        async delete(id) {
+          deleted.push(id);
+          for (const [k, v] of store.entries()) {
+            if (v.id === id) store.delete(k);
+          }
+        },
+        async create({ attachment, name }) {
+          assert.ok(Buffer.isBuffer(attachment) && attachment.length > 0);
+          seq += 1n;
+          const obj = { id: seq.toString(), name, animated: true };
+          store.set(obj.id, obj);
+          created.push(name);
+          return obj;
+        },
+      },
+    },
+  };
+
+  const stats = await syncApplicationEmojisFromFiles(fakeClient, { delayMs: 0 });
+  assert.equal(stats.updated, 1);
+  assert.equal(stats.created, manifest.emojis.length - 1);
+  assert.equal(stats.failed, 0);
+  assert.deepEqual(deleted, ["160000000000000001"]);
+  assert.ok(created.includes("moon_red_check"));
+  assert.match(fakeClient.emoji.check, /^<a:moon_red_check:\d{18}>$/);
+  assert.equal(fakeClient.emoji.load, fakeClient.emoji.loading);
+  assert.equal(fakeClient.emoji.like, fakeClient.emoji.favourite);
+  assert.equal(fakeClient.emoji.suffle, fakeClient.emoji.shuffle);
+});
+
+test("bot uses red theme colors, VENOME credit, and dynamic progressbar dot", () => {
+  assert.equal(THEME.accent, 0xEF4444);
+  assert.equal(THEME.primary, 0xDC2626);
+  assert.equal(resolveBotColor("#3f4652"), "#EF4444");
+  assert.equal(resolveBotColor("#a78bfa"), "#EF4444");
+
+  const client = fixture();
+  const home = help.buildHelpMenu(client, member, ".");
+  const serialized = JSON.stringify(home);
+  assert.match(serialized, /Made by VENOME/);
+  assert.match(serialized, /rock-forge/);
+  assert.equal(home.components[0].toJSON().accent_color, 0xEF4444);
+
+  const emojis = require("../src/emojis");
+  const originalDot = emojis.dot;
+  emojis.dot = "<a:moon_red_dot:170000000000000099>";
+  try {
+    const { progressbar } = require("../src/utils/progressbar");
+    const rendered = progressbar({ queue: { current: { length: 100000 } }, shoukaku: { position: 50000 } });
+    assert.ok(rendered.includes("<a:moon_red_dot:170000000000000099>"));
+  } finally {
+    emojis.dot = originalDot;
+  }
 });
 
 test("only owners see owner tools; every command page fits Discord's component limits", () => {

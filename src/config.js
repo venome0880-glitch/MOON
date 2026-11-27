@@ -56,7 +56,7 @@ module.exports = {
     SpotifyID: process.env.SPOTIFY_CLIENT_ID,
     SpotifySecret: process.env.SPOTIFY_CLIENT_SECRET,
     mongourl: process.env.MONGO_URI || requireEnv("MONGODB_URL"),
-    color: /^#[0-9a-f]{6}$/i.test(process.env.BOT_COLOR || "") ? process.env.BOT_COLOR : "#00D4FF",
+    color: /^#[0-9a-f]{6}$/i.test(process.env.BOT_COLOR || "") ? process.env.BOT_COLOR : "#EF4444",
     logs: "",
     node_source: process.env.LAVALINK_SOURCE || "spsearch",
 

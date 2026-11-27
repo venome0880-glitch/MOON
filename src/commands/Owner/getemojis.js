@@ -53,7 +53,7 @@ module.exports = {
 
         // Send the response
         const header = new TextDisplayBuilder()
-            .setContent(`### ${client.emoji?.check || '✅'} Emoji Configuration Generated\n-# ${guild.name}`);
+            .setContent(`### ${client.emoji?.check || '⭕'} Emoji Configuration Generated\n-# ${guild.name}`);
 
         const separator = new SeparatorBuilder();
 

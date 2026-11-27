@@ -14,24 +14,24 @@ const COLORS = Object.freeze({
   info: THEME.primary,
   success: THEME.accent,
   warning: 0xF0B232,
-  danger: 0xED4245,
+  danger: 0xDC2626,
 });
 const STATUS = Object.freeze({
-  info: { label: "Update", key: "info", fallback: "ℹ️" },
-  success: { label: "Done", key: "check", fallback: "✅" },
-  warning: { label: "Attention", key: "warn", fallback: "⚠️" },
+  info: { label: "Update", key: "info", fallback: "🔻" },
+  success: { label: "Done", key: "check", fallback: "⭕" },
+  warning: { label: "Attention", key: "warn", fallback: "❗" },
   danger: { label: "Error", key: "cross", fallback: "❌" },
 });
 const CUSTOM_EMOJI = /^<(a?):([A-Za-z0-9_]{2,32}):(\d{17,20})>$/;
 const UNICODE_EMOJI = /^[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u200D\uFE0E\uFE0F]+$/u;
 
-function displayEmoji(value, fallback = "ℹ️") {
+function displayEmoji(value, fallback = "🔻") {
   for (const candidate of [value, fallback]) {
     if (typeof candidate !== "string") continue;
     const token = candidate.trim();
     if (CUSTOM_EMOJI.test(token) || (token.length <= 32 && UNICODE_EMOJI.test(token) && /[\p{Extended_Pictographic}\p{Regional_Indicator}]/u.test(token))) return token;
   }
-  return "ℹ️";
+  return "🔻";
 }
 
 function componentEmoji(value, fallback) {

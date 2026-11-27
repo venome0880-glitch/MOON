@@ -1155,7 +1155,7 @@ manager.on("clusterCreate", (cluster) => {
 
 console.clear();
 // MOON Banner
-console.log(`\x1b[36m
+console.log(`\x1b[91m
     ( o.o )  MOON
    ( > ^ < ) BOT
 \x1b[0m`);

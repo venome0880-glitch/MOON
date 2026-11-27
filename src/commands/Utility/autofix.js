@@ -72,7 +72,7 @@ module.exports = {
 
       if (actionTaken) {
         const successDisplay = new TextDisplayBuilder()
-          .setContent(`### 🔧 **Autofix Complete!**\n> The bot's voice state and player have been forcefully reset.\n> You should now be able to use \`/play\` normally.`);
+          .setContent(`### ${client.emoji?.utility || "🛠️"} **Autofix Complete!**\n> The bot's voice state and player have been forcefully reset.\n> You should now be able to use \`/play\` normally.`);
         
         const container = new ContainerBuilder()
           .addTextDisplayComponents(successDisplay);
@@ -83,7 +83,7 @@ module.exports = {
         });
       } else {
         const infoDisplay = new TextDisplayBuilder()
-          .setContent(`### ${client.emoji.info || 'ℹ️'} **Nothing to Fix**\n> The bot is not currently connected to any voice channel or player.`);
+          .setContent(`### ${client.emoji?.info || "🔻"} **Nothing to Fix**\n> The bot is not currently connected to any voice channel or player.`);
         
         const container = new ContainerBuilder()
           .addTextDisplayComponents(infoDisplay);

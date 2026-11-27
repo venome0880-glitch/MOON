@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="dashboard/public/branding/kreo-banner-v2.webp" alt="Kreo — music for your Discord server" width="960" />
+  <img src="dashboard/public/branding/kreo-banner-v2.webp" alt="MOON — music for your Discord server" width="960" />
 </p>
 
-<h1 align="center">Kreo</h1>
+<h1 align="center">MOON</h1>
 
 <p align="center">
-  A Discord music bot with a purple, responsive dashboard.<br />
+  Made by <strong>VENOME</strong> — a Discord music bot with a red Discord UI theme, animated application emojis, and a purple, responsive dashboard.<br />
   Find a track, build a queue, and keep your server listening together.
 </p>
 
@@ -13,7 +13,7 @@
   <a href="./package.json"><img src="https://img.shields.io/badge/Node.js-24-5FA04E?style=flat-square" alt="Recommended runtime: Node.js 24" /></a>
   <a href="./package.json"><img src="https://img.shields.io/badge/discord.js-14-5865F2?style=flat-square" alt="discord.js 14" /></a>
   <a href="./dashboard/package.json"><img src="https://img.shields.io/badge/Next.js-16-171717?style=flat-square" alt="Next.js 16" /></a>
-  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Source%20available-A78BFA?style=flat-square" alt="Source available — read LICENSE" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Source%20available-EF4444?style=flat-square" alt="Source available — read LICENSE" /></a>
 </p>
 
 <p align="center">
@@ -31,7 +31,7 @@
 | Search, queue, pause, skip, seek, volume, and filters | Search and playback controls with live player updates |
 | Liked tracks, playlists, and listening history | Personal liked songs and playlists |
 | 24/7 configuration and connection recovery | Server settings, pinned servers, and recent rooms |
-| Category help, owner controls, and application emoji support | Purple theme, desktop artwork, and mobile navigation |
+| Category help, owner controls, and red animated application emojis | Purple theme, desktop artwork, and mobile navigation |
 
 The bot uses discord.js, Kazagumo, and Shoukaku with a Lavalink v4 node. The dashboard uses Next.js, React, and Discord OAuth. MongoDB stores persistent settings and music collections.
 
@@ -44,8 +44,8 @@ Use **Node.js 24**, matching the included dashboard Docker image. You also need 
 ### 1. Get the source and install dependencies
 
 ```sh
-git clone https://github.com/rock-forge/Kreo.git
-cd Kreo
+git clone https://github.com/venome0880-glitch/MOON.git
+cd MOON
 npm ci
 npm ci --prefix dashboard
 ```
@@ -113,7 +113,7 @@ In production, keep the bridge HTTP API on a private connection and expose only 
 
 Use `/help` or your configured prefix followed by `help` to browse commands. Owners listed in `OWNER_IDS` can see and use owner commands. Discord administrator permission alone does not make someone a bot owner.
 
-At startup, Kreo attempts to load emojis belonging to its own Discord application. Existing fallback icons remain available when custom application emojis are unavailable.
+At startup, MOON loads animated red-theme emojis from [`assets/emojis/manifest.json`](./assets/emojis/manifest.json) and automatically syncs any missing animated GIF files in [`assets/emojis/`](./assets/emojis) to its Discord application (`moon_red_*`). Red-theme fallback icons in [`src/emojis.js`](./src/emojis.js) remain available when Discord application emojis cannot be fetched. Bot owners can also trigger a sync with `/syncemojis` (`>syncemojis`) or `npm run emojis:sync`.
 
 ## Check your setup
 
@@ -146,6 +146,6 @@ See the [detailed troubleshooting section](./SETUP_GUIDE.md#9-troubleshooting) f
 
 ## License and third-party notices
 
-Kreo is credited to **[rock-forge](https://github.com/rock-forge)**. This is a **source-available** release for normal noncommercial use under [LICENSE](./LICENSE). **Commercial use, resale, and public redistribution of modified versions require rock-forge's written permission.** Read the license for the complete permitted use, attribution requirements, and restrictions.
+MOON is made by **[VENOME](https://github.com/venome0880-glitch/MOON)**, based on Kreo by **[rock-forge](https://github.com/rock-forge)**. This is a **source-available** release for normal noncommercial use under [LICENSE](./LICENSE). **Commercial use, resale, and public redistribution of modified versions require rock-forge's written permission.** Read the license for the complete permitted use, attribution requirements, and restrictions.
 
 Third-party components remain subject to their own terms. See [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) and the licenses distributed with the dependencies.

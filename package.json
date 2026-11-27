@@ -10,7 +10,8 @@
     "dev": "concurrently -n \"BOT,DASH\" -c \"magenta,blue\" \"npm run dev:bot\" \"npm run dev:dash\"",
     "start": "concurrently -n \"BOT,DASH\" -c \"magenta,blue\" \"npm run start:bot\" \"npm run start:dash\"",
     "test": "node --test --test-concurrency=1",
-    "check:services": "node scripts/check-services.cjs"
+    "check:services": "node scripts/check-services.cjs",
+    "emojis:sync": "node scripts/sync-emojis.cjs"
   },
   "dependencies": {
     "axios": "^1.20.0",

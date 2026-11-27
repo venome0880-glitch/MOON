@@ -32,7 +32,7 @@ function buildResultsContainer(client, tracks, cacheKey) {
   });
 
   const info = new TextDisplayBuilder().setContent(
-    `### 🔍 Search Results\n${lines.join("\n")}\n\n*Select a track number below to enqueue it.*`
+    `### ${client.emoji?.search || "🔎"} Search Results\n${lines.join("\n")}\n\n*Select a track number below to enqueue it.*`
   );
   const container = new ContainerBuilder().addTextDisplayComponents(info);
 

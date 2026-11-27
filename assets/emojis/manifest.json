@@ -1,0 +1,229 @@
+{
+  "theme": "red",
+  "animated": true,
+  "prefix": "moon_red_",
+  "emojis": [
+    {
+      "key": "check",
+      "name": "moon_red_check",
+      "file": "moon_red_check.gif",
+      "animated": true,
+      "fallback": "\u2b55"
+    },
+    {
+      "key": "cross",
+      "name": "moon_red_cross",
+      "file": "moon_red_cross.gif",
+      "animated": true,
+      "fallback": "\u274c"
+    },
+    {
+      "key": "info",
+      "name": "moon_red_info",
+      "file": "moon_red_info.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd3b"
+    },
+    {
+      "key": "warn",
+      "name": "moon_red_warn",
+      "file": "moon_red_warn.gif",
+      "animated": true,
+      "fallback": "\u2757"
+    },
+    {
+      "key": "star",
+      "name": "moon_red_star",
+      "file": "moon_red_star.gif",
+      "animated": true,
+      "fallback": "\u2666\ufe0f"
+    },
+    {
+      "key": "dot",
+      "name": "moon_red_dot",
+      "file": "moon_red_dot.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd34"
+    },
+    {
+      "key": "loading",
+      "name": "moon_red_loading",
+      "file": "moon_red_loading.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd34"
+    },
+    {
+      "key": "pause",
+      "name": "moon_red_pause",
+      "file": "moon_red_pause.gif",
+      "animated": true,
+      "fallback": "\u23f8\ufe0f"
+    },
+    {
+      "key": "play",
+      "name": "moon_red_play",
+      "file": "moon_red_play.gif",
+      "animated": true,
+      "fallback": "\u25b6\ufe0f"
+    },
+    {
+      "key": "stop",
+      "name": "moon_red_stop",
+      "file": "moon_red_stop.gif",
+      "animated": true,
+      "fallback": "\ud83d\uded1"
+    },
+    {
+      "key": "voldown",
+      "name": "moon_red_voldown",
+      "file": "moon_red_voldown.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd09"
+    },
+    {
+      "key": "volup",
+      "name": "moon_red_volup",
+      "file": "moon_red_volup.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd0a"
+    },
+    {
+      "key": "skip",
+      "name": "moon_red_skip",
+      "file": "moon_red_skip.gif",
+      "animated": true,
+      "fallback": "\u23ed\ufe0f"
+    },
+    {
+      "key": "previous",
+      "name": "moon_red_previous",
+      "file": "moon_red_previous.gif",
+      "animated": true,
+      "fallback": "\u23ee\ufe0f"
+    },
+    {
+      "key": "shuffle",
+      "name": "moon_red_shuffle",
+      "file": "moon_red_shuffle.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd00"
+    },
+    {
+      "key": "loop",
+      "name": "moon_red_loop",
+      "file": "moon_red_loop.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd01"
+    },
+    {
+      "key": "dance",
+      "name": "moon_red_dance",
+      "file": "moon_red_dance.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd25"
+    },
+    {
+      "key": "music",
+      "name": "moon_red_music",
+      "file": "moon_red_music.gif",
+      "animated": true,
+      "fallback": "\ud83c\udfb6"
+    },
+    {
+      "key": "favourite",
+      "name": "moon_red_favourite",
+      "file": "moon_red_favourite.gif",
+      "animated": true,
+      "fallback": "\u2764\ufe0f"
+    },
+    {
+      "key": "autoplay",
+      "name": "moon_red_autoplay",
+      "file": "moon_red_autoplay.gif",
+      "animated": true,
+      "fallback": "\u267e\ufe0f"
+    },
+    {
+      "key": "config",
+      "name": "moon_red_config",
+      "file": "moon_red_config.gif",
+      "animated": true,
+      "fallback": "\u2699\ufe0f"
+    },
+    {
+      "key": "utility",
+      "name": "moon_red_utility",
+      "file": "moon_red_utility.gif",
+      "animated": true,
+      "fallback": "\ud83d\udee0\ufe0f"
+    },
+    {
+      "key": "filters",
+      "name": "moon_red_filters",
+      "file": "moon_red_filters.gif",
+      "animated": true,
+      "fallback": "\ud83c\udf9a\ufe0f"
+    },
+    {
+      "key": "home",
+      "name": "moon_red_home",
+      "file": "moon_red_home.gif",
+      "animated": true,
+      "fallback": "\ud83c\udfe0"
+    },
+    {
+      "key": "search",
+      "name": "moon_red_search",
+      "file": "moon_red_search.gif",
+      "animated": true,
+      "fallback": "\ud83d\udd0e"
+    },
+    {
+      "key": "youtube",
+      "name": "moon_red_youtube",
+      "file": "moon_red_youtube.gif",
+      "animated": true,
+      "fallback": "\u25b6\ufe0f"
+    },
+    {
+      "key": "spotify",
+      "name": "moon_red_spotify",
+      "file": "moon_red_spotify.gif",
+      "animated": true,
+      "fallback": "\ud83c\udfb6"
+    },
+    {
+      "key": "ytmusic",
+      "name": "moon_red_ytmusic",
+      "file": "moon_red_ytmusic.gif",
+      "animated": true,
+      "fallback": "\ud83c\udfb6"
+    },
+    {
+      "key": "applemusic",
+      "name": "moon_red_applemusic",
+      "file": "moon_red_applemusic.gif",
+      "animated": true,
+      "fallback": "\u2764\ufe0f"
+    },
+    {
+      "key": "deezer",
+      "name": "moon_red_deezer",
+      "file": "moon_red_deezer.gif",
+      "animated": true,
+      "fallback": "\ud83c\udfb6"
+    },
+    {
+      "key": "jiosaavn",
+      "name": "moon_red_jiosaavn",
+      "file": "moon_red_jiosaavn.gif",
+      "animated": true,
+      "fallback": "\ud83c\udfb6"
+    }
+  ],
+  "aliases": {
+    "load": "loading",
+    "suffle": "shuffle",
+    "like": "favourite"
+  }
+}
