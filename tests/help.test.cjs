@@ -108,7 +108,7 @@ test("bot uses red theme colors, VENOME credit, and dynamic progressbar dot", ()
   const client = fixture();
   const home = help.buildHelpMenu(client, member, ".");
   const serialized = JSON.stringify(home);
-  assert.match(serialized, /Made by VENOME/);
+  assert.match(serialized, /\[MOON by VENOME\]\(https:\/\/github\.com\/venome0880-glitch\/MOON\)/);
   assert.match(serialized, /rock-forge/);
   assert.equal(home.components[0].toJSON().accent_color, 0xEF4444);
 
