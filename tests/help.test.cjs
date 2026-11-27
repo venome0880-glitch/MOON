@@ -109,8 +109,17 @@ test("bot uses red theme colors, VENOME credit, and dynamic progressbar dot", ()
   const home = help.buildHelpMenu(client, member, ".");
   const serialized = JSON.stringify(home);
   assert.match(serialized, /\[MOON by VENOME\]\(https:\/\/github\.com\/venome0880-glitch\/MOON\)/);
-  assert.match(serialized, /rock-forge/);
+  assert.doesNotMatch(serialized, /Based on Kreo by rock-forge/);
   assert.equal(home.components[0].toJSON().accent_color, 0xEF4444);
+
+  const aboutCmd = client.commands.get("about");
+  assert.ok(aboutCmd, "about command should be registered");
+  const aboutPayload = aboutCmd.buildAboutPayload(client, ".");
+  const aboutSerialized = JSON.stringify(aboutPayload);
+  assert.match(aboutSerialized, /\[MOON by VENOME\]\(https:\/\/github\.com\/venome0880-glitch\/MOON\)/);
+  assert.match(aboutSerialized, /Kreo by rock-forge/);
+  assert.match(aboutSerialized, /https:\/\/github\.com\/rock-forge\/Kreo/);
+  assert.equal(aboutPayload.components[0].toJSON().accent_color, 0xEF4444);
 
   const emojis = require("../src/emojis");
   const originalDot = emojis.dot;

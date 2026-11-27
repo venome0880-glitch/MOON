@@ -134,7 +134,7 @@ function buildHelpMenu(client, userId, prefix, {
     new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(label).setURL(url).setEmoji(icon(client, emoji)))));
   container.addTextDisplayComponents(text(
     `-# Use \`${inline(prefix)}help <command>\` for usage and aliases. · Menu expires <t:${Math.floor(expiresAt / 1000)}:R>.\n` +
-    `-# [MOON by VENOME](https://github.com/venome0880-glitch/MOON) · Based on [Kreo by rock-forge](https://github.com/rock-forge/Kreo)`,
+    `-# [MOON by VENOME](https://github.com/venome0880-glitch/MOON)`,
   ));
   return { components: [container], flags: MessageFlags.IsComponentsV2, allowedMentions: { parse: [], repliedUser: false } };
 }
