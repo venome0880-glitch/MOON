@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "devrock.js",
   "scripts": {
+    "build": "npm ci --prefix dashboard --include=dev --no-audit --no-fund && npm run build --prefix dashboard && node scripts/prepare-dashboard-standalone.cjs",
     "start:bot": "node --no-deprecation devrock.js",
     "start:dash": "npm run start --prefix dashboard",
     "dev:bot": "node --no-deprecation devrock.js",
     "dev:dash": "npm run dev --prefix dashboard",
     "dev": "concurrently -n \"BOT,DASH\" -c \"magenta,blue\" \"npm run dev:bot\" \"npm run dev:dash\"",
-    "start": "concurrently -n \"BOT,DASH\" -c \"magenta,blue\" \"npm run start:bot\" \"npm run start:dash\"",
+    "start": "node scripts/start-all.cjs",
     "test": "node --test --test-concurrency=1",
     "check:services": "node scripts/check-services.cjs",
     "emojis:sync": "node scripts/sync-emojis.cjs"
