@@ -125,6 +125,11 @@ function spawnDashboard(dashboardPort, bridgePort) {
   });
 }
 
+function calculateBotRestartDelayMs(attempt, baseDelayMs = 5000, maxDelayMs = 60000) {
+  const safeAttempt = Math.max(0, Number(attempt) || 0);
+  return Math.min(maxDelayMs, baseDelayMs * 2 ** Math.min(safeAttempt, 6));
+}
+
 function startAll() {
   const { publicPort, bridgePort, dashboardPort } = resolvePorts(process.env);
   const defaultHttps = String(process.env.NEXTAUTH_URL || "").startsWith("https://");
@@ -138,18 +143,49 @@ function startAll() {
     ...process.env,
     BRIDGE_PORT: String(bridgePort),
   };
-  const bot = spawn(process.execPath, ["--no-deprecation", "devrock.js"], {
-    cwd: ROOT_DIR,
-    env: botEnv,
-    stdio: "inherit",
-  });
-
   const dash = spawnDashboard(dashboardPort, bridgePort);
   let shuttingDown = false;
+  let bot = null;
+  let botRestartTimer = null;
+  let botStableTimer = null;
+  let botRestartAttempt = 0;
+
+  const launchBot = () => {
+    if (shuttingDown) return;
+    const currentBot = spawn(process.execPath, ["--no-deprecation", "devrock.js"], {
+      cwd: ROOT_DIR,
+      env: botEnv,
+      stdio: "inherit",
+    });
+    bot = currentBot;
+
+    clearTimeout(botStableTimer);
+    botStableTimer = setTimeout(() => {
+      if (!shuttingDown && bot === currentBot) {
+        botRestartAttempt = 0;
+      }
+    }, 60000);
+    botStableTimer.unref?.();
+
+    currentBot.on("exit", (code) => {
+      clearTimeout(botStableTimer);
+      if (shuttingDown) return;
+
+      const delayMs = calculateBotRestartDelayMs(botRestartAttempt);
+      botRestartAttempt += 1;
+      console.error(`[BOT] Exited with code ${code ?? 1}; keeping dashboard online and restarting bot in ${Math.round(delayMs / 1000)}s`);
+      botRestartTimer = setTimeout(launchBot, delayMs);
+      botRestartTimer.unref?.();
+    });
+  };
+
+  launchBot();
 
   const shutdown = (exitCode = 0) => {
     if (shuttingDown) return;
     shuttingDown = true;
+    clearTimeout(botRestartTimer);
+    clearTimeout(botStableTimer);
     gateway.close(() => {});
     for (const child of [bot, dash]) {
       if (child && !child.killed) {
@@ -158,13 +194,6 @@ function startAll() {
     }
     setTimeout(() => process.exit(exitCode), 500).unref();
   };
-
-  bot.on("exit", (code) => {
-    if (!shuttingDown) {
-      console.error(`[BOT] Exited with code ${code ?? 1}`);
-      shutdown(code || 1);
-    }
-  });
 
   dash.on("exit", (code) => {
     if (!shuttingDown) {
@@ -181,4 +210,4 @@ if (require.main === module) {
   startAll();
 }
 
-module.exports = { resolvePorts, createGatewayServer };
+module.exports = { resolvePorts, createGatewayServer, calculateBotRestartDelayMs };

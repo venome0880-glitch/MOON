@@ -5,8 +5,13 @@ const http = require("node:http");
 const net = require("node:net");
 const os = require("node:os");
 const path = require("node:path");
-const { resolvePorts, createGatewayServer } = require("../scripts/start-all.cjs");
+const { resolvePorts, createGatewayServer, calculateBotRestartDelayMs } = require("../scripts/start-all.cjs");
 const { prepareDashboardStandalone } = require("../scripts/prepare-dashboard-standalone.cjs");
+const {
+  parseExplicitShardCount,
+  resolveTotalShards,
+  spawnClustersWithFallback,
+} = require("../src/utils/clusterSpawn");
 
 test("resolvePorts prevents collisions between public, bridge, and dashboard ports", () => {
   assert.deepEqual(resolvePorts({}), { publicPort: 3000, bridgePort: 2000, dashboardPort: 3001 });
@@ -131,4 +136,152 @@ test("prepareDashboardStandalone copies public and static assets into standalone
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
   }
+});
+
+test("calculateBotRestartDelayMs backs off exponentially and caps at maxDelayMs", () => {
+  assert.equal(calculateBotRestartDelayMs(0), 5000);
+  assert.equal(calculateBotRestartDelayMs(1), 10000);
+  assert.equal(calculateBotRestartDelayMs(2), 20000);
+  assert.equal(calculateBotRestartDelayMs(4), 60000);
+  assert.equal(calculateBotRestartDelayMs(10), 60000);
+});
+
+test("parseExplicitShardCount only accepts integers >= 1", () => {
+  assert.equal(parseExplicitShardCount(undefined), null);
+  assert.equal(parseExplicitShardCount("auto"), null);
+  assert.equal(parseExplicitShardCount("0"), null);
+  assert.equal(parseExplicitShardCount("1.5"), null);
+  assert.equal(parseExplicitShardCount("2"), 2);
+});
+
+test("resolveTotalShards skips Discord API when TOTAL_SHARDS is explicit", async () => {
+  let called = false;
+  const res = await resolveTotalShards({
+    token: "abc",
+    env: { TOTAL_SHARDS: "3" },
+    fetchRecommendedShards: async () => {
+      called = true;
+      return 1;
+    },
+  });
+  assert.equal(called, false);
+  assert.deepEqual(res, { totalShards: 3, source: "env" });
+});
+
+test("resolveTotalShards retries 429 and falls back to 1 shard instead of crashing", async () => {
+  const waits = [];
+  const warnings = [];
+  let attempts = 0;
+
+  const fallbackRes = await resolveTotalShards({
+    token: "abc",
+    env: {},
+    retryDelayMs: 100,
+    maxAttempts: 3,
+    defaultShards: 1,
+    wait: async (ms) => waits.push(ms),
+    logger: { warn: (msg) => warnings.push(msg) },
+    fetchRecommendedShards: async () => {
+      attempts += 1;
+      const err = new Error("Failed to fetch data. Status code: 429");
+      err.statusCode = 429;
+      throw err;
+    },
+  });
+
+  assert.equal(attempts, 3);
+  assert.deepEqual(waits, [100, 200]);
+  assert.equal(fallbackRes.totalShards, 1);
+  assert.equal(fallbackRes.source, "fallback");
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /429/);
+
+  let retryCount = 0;
+  const recoveredRes = await resolveTotalShards({
+    token: "abc",
+    env: {},
+    retryDelayMs: 50,
+    maxAttempts: 3,
+    wait: async () => {},
+    logger: { warn: () => {} },
+    fetchRecommendedShards: async () => {
+      retryCount += 1;
+      if (retryCount === 1) {
+        const err = new Error("Failed to fetch data. Status code: 429");
+        err.statusCode = 429;
+        err.retryAfterMs = 250;
+        throw err;
+      }
+      return 2;
+    },
+  });
+  assert.equal(retryCount, 2);
+  assert.deepEqual(recoveredRes, { totalShards: 2, source: "discord" });
+});
+
+test("resolveTotalShards breaks early on long Retry-After and rethrows 401 invalid token", async () => {
+  const waits = [];
+  const res = await resolveTotalShards({
+    token: "abc",
+    env: {},
+    maxRetryWaitMs: 1000,
+    maxAttempts: 3,
+    wait: async (ms) => waits.push(ms),
+    logger: { warn: () => {} },
+    fetchRecommendedShards: async () => {
+      const err = new Error("Failed to fetch data. Status code: 429");
+      err.statusCode = 429;
+      err.retryAfterMs = 30000;
+      throw err;
+    },
+  });
+  assert.deepEqual(waits, []);
+  assert.equal(res.totalShards, 1);
+  assert.equal(res.source, "fallback");
+
+  await assert.rejects(
+    resolveTotalShards({
+      token: "bad",
+      env: {},
+      fetchRecommendedShards: async () => {
+        const err = new Error("DISCORD_TOKEN_INVALID");
+        err.statusCode = 401;
+        throw err;
+      },
+    }),
+    /DISCORD_TOKEN_INVALID/
+  );
+});
+
+test("spawnClustersWithFallback syncs manager.totalShards before calling manager.spawn", async () => {
+  let seenManagerTotal = null;
+  let seenSpawnOpts = null;
+  const fakeManager = {
+    totalShards: -1,
+    spawnOptions: { amount: -1, delay: 7000, timeout: -1 },
+    async spawn(opts) {
+      seenManagerTotal = this.totalShards;
+      seenSpawnOpts = opts;
+      return new Map();
+    },
+  };
+
+  const res = await spawnClustersWithFallback({
+    manager: fakeManager,
+    token: "abc",
+    env: {},
+    maxAttempts: 1,
+    logger: { warn: () => {} },
+    fetchRecommendedShards: async () => {
+      const err = new Error("Failed to fetch data. Status code: 429");
+      err.statusCode = 429;
+      throw err;
+    },
+  });
+
+  assert.equal(res.totalShards, 1);
+  assert.equal(fakeManager.totalShards, 1);
+  assert.equal(fakeManager.spawnOptions.amount, 1);
+  assert.equal(seenManagerTotal, 1);
+  assert.deepEqual(seenSpawnOpts, { amount: 1, timeout: -1 });
 });

@@ -10,6 +10,7 @@ const { Server } = require("socket.io");
 const { KazagumoTrack } = require("kazagumo");
 const { verifySocketToken } = require("./src/utils/dashboardSocketAuth");
 const { validateBridgeRequest } = require("./src/utils/bridgePolicy");
+const { spawnClustersWithFallback } = require("./src/utils/clusterSpawn");
 
 const ACTION_LOGGER_PATH = path.join(__dirname, "src", "utils", "actionLogger.js");
 const AUTO_RECONNECT_SCHEMA_PATH = path.join(__dirname, "src", "schema", "247.js");
@@ -1231,5 +1232,11 @@ server.listen(BRIDGE_PORT, () => {
     server.on("close", () => tunnel.close());
 });
 
-manager.spawn({ timeout: -1 });
+spawnClustersWithFallback({
+    manager,
+    token: config.token,
+    logger: Logger,
+}).catch((err) => {
+    Logger.error(`Cluster spawn failed: ${err?.message || err}`);
+});
 
