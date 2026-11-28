@@ -55,3 +55,21 @@ test("command registration preserves an app's activity entry point and context m
   assert.equal(merged[2].type, 2);
   assert.throws(() => mergeApplicationCommands([], null));
 });
+
+test("bot presence uses Discord Streaming activity with a valid stream URL", () => {
+  const { ActivityType } = require("discord.js");
+  const ready = require("../src/events/Client/ready");
+  const updates = [];
+  const fakeClient = {
+    config: { streamUrl: "https://www.twitch.tv/venome" },
+    guilds: { cache: new Map([["1", { memberCount: 42 }]]) },
+    user: { setPresence: (payload) => updates.push(payload) },
+  };
+  ready.updateStreamingPresence(fakeClient, 1);
+  assert.equal(updates.length, 1);
+  assert.equal(updates[0].status, "online");
+  assert.equal(updates[0].activities[0].type, ActivityType.Streaming);
+  assert.equal(updates[0].activities[0].name, "MOON • High Quality Music");
+  assert.equal(updates[0].activities[0].url, "https://www.twitch.tv/venome");
+  assert.equal(ready.resolveStreamUrl("javascript:alert(1)"), ready.DEFAULT_STREAM_URL);
+});

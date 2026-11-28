@@ -1,10 +1,51 @@
-const { prefix } = require("../../config.js");
 const { ActivityType, REST, Routes } = require("discord.js");
 const { registerApplicationCommands } = require("../../utils/registerApplicationCommands");
+
+const DEFAULT_STREAM_URL = "https://www.twitch.tv/discord";
+
+function resolveStreamUrl(value) {
+  if (typeof value !== "string" || !value.trim()) return DEFAULT_STREAM_URL;
+  try {
+    const parsed = new URL(value.trim());
+    const host = parsed.hostname.toLowerCase();
+    const isTwitch = host === "twitch.tv" || host === "www.twitch.tv";
+    const isYoutube = host === "youtube.com" || host === "www.youtube.com";
+    if (parsed.protocol === "https:" && (isTwitch || isYoutube)) {
+      return parsed.href;
+    }
+  } catch {}
+  return DEFAULT_STREAM_URL;
+}
+
+function updateStreamingPresence(client, index) {
+  const totalMembers = [...client.guilds.cache.values()].reduce((acc, guild) => acc + (guild.memberCount || 0), 0);
+  const statuses = [
+    `Serving ${client.guilds.cache.size} Servers • ${totalMembers} Users`,
+    `MOON • High Quality Music`,
+    `/help • 24/7 Audio System`,
+    `Vibing with ${totalMembers} Users`
+  ];
+  const chosenIndex = Number.isInteger(index) ? Math.abs(index) % statuses.length : Math.floor(Math.random() * statuses.length);
+  const streamUrl = resolveStreamUrl(client.config?.streamUrl || process.env.STREAM_URL);
+
+  client.user.setPresence({
+    activities: [
+      {
+        name: statuses[chosenIndex],
+        type: ActivityType.Streaming,
+        url: streamUrl,
+      },
+    ],
+    status: "online",
+  });
+}
 
 module.exports = {
   name: "clientReady",
   once: true,
+  DEFAULT_STREAM_URL,
+  resolveStreamUrl,
+  updateStreamingPresence,
   run: async (client) => {
     await require("../../utils/applicationEmojis").loadApplicationEmojis(client);
     client.logger.log(`${client.user.username} is now online.`, "ready");
@@ -85,26 +126,9 @@ module.exports = {
       }
     }, 60000 * 5); // Check every 5 minutes
 
+    updateStreamingPresence(client, 1);
     setInterval(() => {
-      const totalMembers = client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
-      const statuses = [
-        `Serving ${client.guilds.cache.size} Servers • ${totalMembers} Users`,
-        `MOON • High Quality Music`,
-        `/help • 24/7 Audio System`,
-        `Vibing with ${totalMembers} Users`
-      ];
-
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
-
-      client.user.setPresence({
-        activities: [
-          {
-            name: status,
-            type: ActivityType.Custom,
-          },
-        ],
-        status: "online",
-      });
+      updateStreamingPresence(client);
     }, 10000);
 
     client.logger.log(
